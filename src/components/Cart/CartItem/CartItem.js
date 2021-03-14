@@ -1,25 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./CartItem.module.css";
+import { connect } from "react-redux";
+import {
+  removeFromCart,
+  adjustQTY,
+} from "../../../redux/Shopping/shopping-actions";
 
-const CartItem = () => {
+const CartItem = ({ item, removeFromCart, adjustQTY }) => {
+  const [input, setInput] = useState(item.qty);
+  const onChangeHandler = (e) => {
+    setInput(e.target.value);
+    adjustQTY(item.id, e.target.value);
+  };
   return (
     <div className={styles.cartItem}>
       <img
         className={styles.cartItem__image}
-        // src={item.image}
-        // alt={item.title}
+        src={item.image}
+        alt={item.title}
       />
       <div className={styles.cartItem__details}>
-        <p className={styles.details__title}>Title</p>
-        <p className={styles.details__desc}>Description</p>
-        <p className={styles.details__price}>$ 10.00</p>
+        <p className={styles.details__title}>{item.title}</p>
+        <p className={styles.details__desc}>{item.description}</p>
+        <p className={styles.details__price}>$ {item.price}</p>
       </div>
       <div className={styles.cartItem__actions}>
         <div className={styles.cartItem__qty}>
           <label htmlFor="qty">Qty</label>
-          <input min="1" type="number" id="qty" name="qty" value="1" />
+          <input
+            min="1"
+            type="number"
+            id="qty"
+            name="qty"
+            value={input}
+            onChange={onChangeHandler}
+          />
         </div>
-        <button className={styles.actions__deleteItemBtn}>
+        <button
+          onClick={() => removeFromCart(item.id)}
+          className={styles.actions__deleteItemBtn}
+        >
           <img
             src="https://image.flaticon.com/icons/svg/709/709519.svg"
             alt=""
@@ -30,4 +50,11 @@ const CartItem = () => {
   );
 };
 
-export default CartItem;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    removeFromCart: (id) => dispatch(removeFromCart(id)),
+    adjustQTY: (id, value) => dispatch(adjustQTY(id, value)),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(CartItem);
